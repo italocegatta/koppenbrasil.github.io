@@ -1,0 +1,4 @@
+name: "koppen"
+output_dir: "."
+navbar:
+  title: "Classificação climática do Brasil de acordo com os critérios de Koppen"

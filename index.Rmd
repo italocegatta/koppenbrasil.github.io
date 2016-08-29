@@ -1,0 +1,107 @@
+---
+title: "Classificação climática do Brasil de acordo com os critérios de Koppen"
+output:
+  flexdashboard::flex_dashboard
+---
+
+Mapas {.tabset}
+-----------------------------
+
+```{r setup, echo=FALSE, warning=FALSE, results='hide'}
+knitr::opts_chunk$set(echo = F)
+
+pacman::p_load(rgdal, leaflet, dplyr, tidyr, DT)
+
+dados <- read.csv2("dados/munic_dados.csv") %>% as.tbl()
+
+mapa <- readOGR(
+  dsn = "dados",
+  layer = "munic_dados",
+  encoding = "ESRI Shapefile"
+)
+
+label_mapa <- paste0(
+  "<strong>Municipio: </strong>", 
+  dados$municipio,
+  "<br><strong>Estado: </strong>", 
+  dados$estado,
+  "<br><strong>Clima Koppen: </strong>", 
+  dados$koppen,
+    "<br><strong>Temperatura media: </strong>", 
+  round(dados$tmed, 1),
+    "<br><strong>Chuva anual: </strong>", 
+  round(dados$ppt, 1)
+)
+```
+
+
+### Clima Koppen
+
+```{r}
+cor_koppen <- data_frame(
+  cod = c("Af", "Am", "As", "Aw", "BSh", "Cfa", "Cfb", "Cwa", "Cwb"),
+  koppen_color = c("#211f63", "#324a99", "#90c1e0", "#3c7dc7", "#d19226", "#acc21b", "#457337", "#549948", "#7dad66")
+)
+
+pal_koppen <- colorFactor(cor_koppen$koppen_color, domain = cor_koppen$cod)
+
+leaflet(mapa) %>%
+  addTiles() %>% 
+  addPolygons(
+    stroke = FALSE, smoothFactor = 0.2, fillOpacity = 0.6,
+    color =  ~pal_koppen(dados$koppen),
+    popup = label_mapa
+  ) %>% 
+  addLegend(title = "Clima Koppen", pal = pal_koppen, values = ~dados$koppen)
+```
+
+<!--
+
+### Temperatura
+
+```{r}
+pal_tmed <- colorBin("OrRd", domain = dados$tmed)
+
+leaflet(mapa) %>%
+  addTiles() %>% 
+  addPolygons(
+    stroke = FALSE, smoothFactor = 0.2, fillOpacity = 0.6,
+    color =  ~pal_tmed(dados$tmed),
+    popup = label_mapa
+  ) %>% 
+  addLegend(title = "Temperatura", pal = pal_tmed, values = ~dados$tmed)
+```
+
+### Chuva
+
+```{r echo=FALSE}
+pal_ppt <- colorBin("Blues", domain = dados$ppt)
+
+leaflet(mapa) %>%
+  addTiles() %>% 
+  addPolygons(
+    stroke = FALSE, smoothFactor = 0.2, fillOpacity = 0.6,
+    color =  ~pal_ppt(dados$ppt),
+    popup = label_mapa
+  ) %>% 
+  addLegend(title = "Chuva anual", pal = pal_ppt, values = ~dados$ppt)
+```
+
+--> 
+
+Municipios
+-----------------------------
+
+### Infomações dos municípios
+
+```{r}
+dados %>%
+  mutate_at(vars(tmed, ppt), round, digits = 1) %>% 
+  select(
+    Estado = estado, Minicipio = municipio, Koppen = koppen,
+    Altitude = altitude, Temperatura = tmed, Chuva = ppt
+    ) %>% 
+  DT::datatable()
+```
+
+
