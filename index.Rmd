@@ -1,22 +1,32 @@
 ---
 title: "Classificação climática do Brasil de acordo com os critérios de Koppen"
 output:
-  flexdashboard::flex_dashboard
+  flexdashboard::flex_dashboard:
+    social: [ "twitter", "facebook", "google-plus", "linkedin" ]
 ---
 
-Mapas {.tabset}
+<!--
+Lateral {.sidebar}
 -----------------------------
 
-```{r setup, echo=FALSE, warning=FALSE, results='hide'}
+A classificação climática de Köppen divide os climas em 5 grandes grupos ("A", "B", "C", "D", "E") e diversos tipos e subtipos. Cada clima é representado por um conjunto variável de letras (com 2 ou 3 caracteres). 
+
+O artigo publicado por [Alvares et al (2013)](http://www.ingentaconnect.com/content/schweiz/mz/pre-prints/content-507_Alvares_ingenta) identificou os tipos climáticos no Brasil com base na temperatura e precipitação mensal de 2.950 estações meteorológicas espalhadas pelo Brasil. O mapa de classificação climática na resolução de 100 m (1 ha) está disponível do [Geodatabase do IPEF](http://www.ipef.br/geodatabase) e pode ser acessado livremente.
+-->
+
+Mapas
+-----------------------------
+
+```{r echo=FALSE, warning=FALSE, results='hide'}
 knitr::opts_chunk$set(echo = F)
 
-pacman::p_load(rgdal, leaflet, dplyr, tidyr, DT)
+pacman::p_load(rgdal, leaflet, dplyr, tidyr, DT, htmltools)
 
 dados <- read.csv2("dados/munic_dados.csv") %>% as.tbl()
 
 mapa <- readOGR(
   dsn = "dados",
-  layer = "munic_dados",
+  layer = "munic_dados_2km",
   encoding = "ESRI Shapefile"
 )
 
@@ -35,7 +45,7 @@ label_mapa <- paste0(
 ```
 
 
-### Clima Koppen
+### Clima Koppen {.no-title}
 
 ```{r}
 cor_koppen <- data_frame(
@@ -89,10 +99,10 @@ leaflet(mapa) %>%
 
 --> 
 
-Municipios
+Municipios 
 -----------------------------
 
-### Infomações dos municípios
+### Infomações dos municípios {.no-title}
 
 ```{r}
 dados %>%
