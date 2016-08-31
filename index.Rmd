@@ -1,5 +1,5 @@
 ---
-title: "Classificação climática do Brasil de acordo com os critérios de Koppen"
+title: "Classificação climática de Köppen para os municípios brasileiros"
 output:
   flexdashboard::flex_dashboard:
     social: [ "twitter", "facebook", "google-plus", "linkedin" ]
@@ -26,7 +26,7 @@ dados <- read.csv2("dados/munic_dados.csv") %>% as.tbl()
 
 mapa <- readOGR(
   dsn = "dados",
-  layer = "munic_dados_2km",
+  layer = "munic_dados_5km",
   encoding = "ESRI Shapefile"
 )
 
@@ -111,7 +111,10 @@ dados %>%
     Estado = estado, Minicipio = municipio, Koppen = koppen,
     Altitude = altitude, Temperatura = tmed, Chuva = ppt
     ) %>% 
-  DT::datatable()
+  DT::datatable(
+    rownames=FALSE,
+    options=list(pageLength = 25)
+  )
 ```
 
 
